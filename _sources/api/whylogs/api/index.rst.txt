@@ -1,0 +1,155 @@
+:py:mod:`whylogs.api`
+=====================
+
+.. py:module:: whylogs.api
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   fugue/index.rst
+   logger/index.rst
+   reader/index.rst
+   store/index.rst
+   usage_stats/index.rst
+   writer/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   annotations/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.ResultSet
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.profiling
+   whylogs.api.log
+   whylogs.api.log_classification_metrics
+   whylogs.api.log_regression_metrics
+   whylogs.api.read
+   whylogs.api.reader
+   whylogs.api.write
+
+
+
+.. py:function:: profiling(*, schema: Optional[whylogs.core.DatasetSchema] = None)
+
+
+.. py:class:: ResultSet
+
+   Bases: :py:obj:`abc.ABC`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+   .. py:method:: view() -> Optional[whylogs.core.DatasetProfileView]
+      :abstractmethod:
+
+
+   .. py:method:: profile() -> Optional[whylogs.core.DatasetProfile]
+      :abstractmethod:
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+   .. py:method:: merge(other: ResultSet) -> ResultSet
+      :abstractmethod:
+
+
+
+.. py:function:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None) -> result_set.ResultSet
+
+
+.. py:function:: log_classification_metrics(data: whylogs.core.stubs.pd.DataFrame, target_column: str, prediction_column: str, score_column: Optional[str] = None, schema: Optional[whylogs.core.DatasetSchema] = None, log_full_data: bool = False) -> result_set.ProfileResultSet
+
+   Function to track metrics based on validation data.
+   user may also pass the associated attribute names associated with
+   target, prediction, and/or score.
+   :param targets: actual validated values
+   :type targets: List[Union[str, bool, float, int]]
+   :param predictions: inferred/predicted values
+   :type predictions: List[Union[str, bool, float, int]]
+   :param scores: assocaited scores for each inferred, all values set to 1 if not
+                  passed
+   :type scores: List[float], optional
+
+
+.. py:function:: log_regression_metrics(data: whylogs.core.stubs.pd.DataFrame, target_column: str, prediction_column: str, schema: Optional[whylogs.core.DatasetSchema] = None, log_full_data: bool = False) -> result_set.ProfileResultSet
+
+   Function to track regression metrics based on validation data.
+   user may also pass the associated attribute names associated with
+   target, prediction, and/or score.
+   :param targets: actual validated values
+   :type targets: List[Union[str, bool, float, int]]
+   :param predictions: inferred/predicted values
+   :type predictions: List[Union[str, bool, float, int]]
+   :param scores: assocaited scores for each inferred, all values set to 1 if not
+                  passed
+   :type scores: List[float], optional
+
+
+.. py:function:: read(path: str) -> result_set.ResultSet
+
+
+.. py:function:: reader(name: str) -> result_set.ResultSetReader
+
+
+.. py:function:: write(profile: whylogs.core.DatasetProfile, base_dir: str) -> None
+
+

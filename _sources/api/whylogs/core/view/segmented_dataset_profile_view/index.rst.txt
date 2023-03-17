@@ -1,0 +1,68 @@
+:py:mod:`whylogs.core.view.segmented_dataset_profile_view`
+==========================================================
+
+.. py:module:: whylogs.core.view.segmented_dataset_profile_view
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.view.segmented_dataset_profile_view.SegmentedDatasetProfileView
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.view.segmented_dataset_profile_view.logger
+
+
+.. py:data:: logger
+
+   
+
+.. py:class:: SegmentedDatasetProfileView(*, profile_view: whylogs.core.view.dataset_profile_view.DatasetProfileView, segment: whylogs.core.segment.Segment, partition: whylogs.core.segmentation_partition.SegmentationPartition)
+
+   Bases: :py:obj:`whylogs.api.writer.writer.Writable`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:property:: segment
+      :type: whylogs.core.segment.Segment
+
+
+   .. py:property:: partition
+      :type: whylogs.core.segmentation_partition.SegmentationPartition
+
+
+   .. py:property:: profile_view
+      :type: whylogs.core.view.dataset_profile_view.DatasetProfileView
+
+
+   .. py:property:: dataset_timestamp
+      :type: Optional[datetime.datetime]
+
+
+   .. py:property:: creation_timestamp
+      :type: Optional[datetime.datetime]
+
+
+   .. py:method:: get_default_path() -> str
+
+
+   .. py:method:: get_segment_string() -> str
+
+
+   .. py:method:: write(path: Optional[str] = None, **kwargs: Any) -> Tuple[bool, str]
+
+
+

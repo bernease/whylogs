@@ -1,0 +1,56 @@
+:py:mod:`whylogs.core.column_profile`
+=====================================
+
+.. py:module:: whylogs.core.column_profile
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.column_profile.ColumnProfile
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.column_profile.logger
+
+
+.. py:data:: logger
+
+   
+
+.. py:class:: ColumnProfile(name: str, schema: whylogs.core.schema.ColumnSchema, cache_size: int)
+
+   Bases: :py:obj:`object`
+
+   .. py:method:: add_metric(metric: whylogs.core.metrics.Metric) -> None
+
+
+   .. py:method:: track(row: Dict[str, Any]) -> None
+
+
+   .. py:method:: flush() -> None
+
+      Force emptying the cache and update the internal metrics.
+
+
+   .. py:method:: track_column(series: Any) -> None
+
+
+   .. py:method:: to_protobuf() -> whylogs.core.proto.ColumnMessage
+
+
+   .. py:method:: view() -> whylogs.core.view.ColumnProfileView
+
+
+

@@ -1,0 +1,75 @@
+:py:mod:`whylogs.api.logger.rolling`
+====================================
+
+.. py:module:: whylogs.api.logger.rolling
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.rolling.Scheduler
+   whylogs.api.logger.rolling.TimedRollingLogger
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.rolling.logger
+
+
+.. py:data:: logger
+
+   
+
+.. py:class:: Scheduler(initial: float, interval: float, function: Callable, *args: Any, **kwargs: Any)
+
+   Bases: :py:obj:`object`
+
+   Multithreading scheduler.
+
+   Schedule a function to be called repeatedly based on a schedule.
+
+   .. py:method:: start() -> None
+
+
+   .. py:method:: stop() -> None
+
+
+
+.. py:class:: TimedRollingLogger(schema: Optional[whylogs.core.DatasetSchema] = None, *, base_name: Optional[str] = None, file_extension: Optional[str] = None, interval: int = 1, when: typing_extensions.Literal[S, M, H, D] = 'H', utc: bool = False, aligned: bool = True, fork: bool = False, skip_empty: bool = False, callback: Optional[Callable[[whylogs.api.writer.Writer, whylogs.core.DatasetProfileView, str], None]] = None)
+
+   Bases: :py:obj:`whylogs.api.logger.logger.Logger`
+
+   A rolling logger that continuously rotates files based on time.
+
+   .. py:method:: check_writer(writer: whylogs.api.writer.Writer) -> None
+
+      Checks if a writer is configured correctly for this class
+
+
+   .. py:method:: close() -> None
+
+
+   .. py:method:: append_writer(name: Optional[str] = None, *, writer: Optional[whylogs.api.writer.Writer] = None, **kwargs: Any) -> None
+
+
+   .. py:method:: append_store(store: whylogs.api.store.ProfileStore) -> None
+
+
+   .. py:method:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None, timestamp_ms: Optional[int] = None) -> whylogs.api.logger.result_set.ResultSet
+
+      :param timestamp_ms: The timestamp of the data being logged. This defaults to now if it isn't provided.
+                           This is used to determine what the dataset timestamp should be. For an hourly model, the dataset
+                           timestamp will end up being the start of the hour of the provided timestamp_ms, UTC.
+
+
+

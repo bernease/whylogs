@@ -1,0 +1,40 @@
+:py:mod:`whylogs.viz.configs`
+=============================
+
+.. py:module:: whylogs.viz.configs
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.viz.configs.HistogramConfig
+
+
+
+
+.. py:class:: HistogramConfig
+
+   .. py:attribute:: max_hist_buckets
+      :type: int
+      :value: 30
+
+      
+
+   .. py:attribute:: hist_avg_number_per_bucket
+      :type: int
+      :value: 4
+
+      
+
+   .. py:attribute:: min_n_buckets
+      :type: int
+      :value: 2
+
+      
+
+

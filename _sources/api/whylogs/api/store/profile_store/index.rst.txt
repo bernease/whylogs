@@ -1,0 +1,39 @@
+:py:mod:`whylogs.api.store.profile_store`
+=========================================
+
+.. py:module:: whylogs.api.store.profile_store
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.store.profile_store.ProfileStore
+
+
+
+
+.. py:class:: ProfileStore
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: list() -> List[str]
+      :abstractmethod:
+
+
+   .. py:method:: get(query: whylogs.api.store.query.BaseQuery) -> whylogs.core.DatasetProfileView
+      :abstractmethod:
+
+
+   .. py:method:: write(profile_view: whylogs.core.DatasetProfileView, dataset_id: str) -> None
+      :abstractmethod:
+
+
+

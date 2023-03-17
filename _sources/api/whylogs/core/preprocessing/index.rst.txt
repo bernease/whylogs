@@ -1,0 +1,160 @@
+:py:mod:`whylogs.core.preprocessing`
+====================================
+
+.. py:module:: whylogs.core.preprocessing
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.preprocessing.ListView
+   whylogs.core.preprocessing.NumpyView
+   whylogs.core.preprocessing.PandasView
+   whylogs.core.preprocessing.PreprocessedColumn
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.preprocessing.logger
+
+
+.. py:data:: logger
+
+   
+
+.. py:class:: ListView
+
+   .. py:attribute:: ints
+      :type: Optional[List[int]]
+
+      
+
+   .. py:attribute:: floats
+      :type: Optional[List[Union[float, decimal.Decimal]]]
+
+      
+
+   .. py:attribute:: strings
+      :type: Optional[List[str]]
+
+      
+
+   .. py:attribute:: tensors
+      :type: Optional[List[whylogs.core.stubs.np.ndarray]]
+
+      
+
+   .. py:attribute:: objs
+      :type: Optional[List[Any]]
+
+      
+
+   .. py:method:: iterables() -> List[List[Any]]
+
+
+
+.. py:class:: NumpyView
+
+   .. py:property:: len
+      :type: int
+
+
+   .. py:attribute:: ints
+      :type: Optional[whylogs.core.stubs.np.ndarray]
+
+      
+
+   .. py:attribute:: floats
+      :type: Optional[whylogs.core.stubs.np.ndarray]
+
+      
+
+   .. py:attribute:: strings
+      :type: Optional[whylogs.core.stubs.np.ndarray]
+
+      
+
+   .. py:method:: iterables() -> List[whylogs.core.stubs.np.ndarray]
+
+
+
+.. py:class:: PandasView
+
+   .. py:attribute:: strings
+      :type: Optional[whylogs.core.stubs.pd.Series]
+
+      
+
+   .. py:attribute:: tensors
+      :type: Optional[whylogs.core.stubs.pd.Series]
+
+      
+
+   .. py:attribute:: objs
+      :type: Optional[whylogs.core.stubs.pd.Series]
+
+      
+
+   .. py:method:: iterables() -> List[whylogs.core.stubs.pd.Series]
+
+
+
+.. py:class:: PreprocessedColumn
+
+   View of a column with data of various underlying storage.
+
+   If Pandas is available, we will use Pandas to handle batch processing.
+   If numpy is available, we will use ndarray for numerical values.
+   Otherwise, we preprocess values into typed lists for downstream consumers.
+   We also track the null count and ensure that processed lists/Series don't contain null values.
+
+   .. py:attribute:: numpy
+      :type: NumpyView
+
+      
+
+   .. py:attribute:: pandas
+      :type: PandasView
+
+      
+
+   .. py:attribute:: list
+      :type: ListView
+
+      
+
+   .. py:attribute:: null_count
+      :type: int
+      :value: 0
+
+      
+
+   .. py:attribute:: len
+      :type: int
+      :value: 0
+
+      
+
+   .. py:attribute:: original
+      :type: Any
+
+      
+
+   .. py:method:: raw_iterator() -> Iterator[Any]
+
+
+   .. py:method:: apply(data: Any) -> PreprocessedColumn
+      :staticmethod:
+
+
+

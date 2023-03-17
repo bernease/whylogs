@@ -1,0 +1,206 @@
+:py:mod:`whylogs.api.writer.whylabs`
+====================================
+
+.. py:module:: whylogs.api.writer.whylabs
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.writer.whylabs.KeyRefresher
+   whylogs.api.writer.whylabs.StaticKeyRefresher
+   whylogs.api.writer.whylabs.EnvironmentKeyRefresher
+   whylogs.api.writer.whylabs.WhyLabsWriter
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.writer.whylabs.FIVE_MINUTES_IN_SECONDS
+   whylogs.api.writer.whylabs.DAY_IN_SECONDS
+   whylogs.api.writer.whylabs.WEEK_IN_SECONDS
+   whylogs.api.writer.whylabs.FIVE_YEARS_IN_SECONDS
+   whylogs.api.writer.whylabs.logger
+   whylogs.api.writer.whylabs.API_KEY_ENV
+
+
+.. py:data:: FIVE_MINUTES_IN_SECONDS
+
+   
+
+.. py:data:: DAY_IN_SECONDS
+
+   
+
+.. py:data:: WEEK_IN_SECONDS
+
+   
+
+.. py:data:: FIVE_YEARS_IN_SECONDS
+
+   
+
+.. py:data:: logger
+
+   
+
+.. py:data:: API_KEY_ENV
+   :value: 'WHYLABS_API_KEY'
+
+   
+
+.. py:class:: KeyRefresher
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:property:: key_id
+      :type: str
+      :abstractmethod:
+
+
+
+.. py:class:: StaticKeyRefresher(api_key: str)
+
+   Bases: :py:obj:`KeyRefresher`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:property:: key_id
+      :type: str
+
+
+
+.. py:class:: EnvironmentKeyRefresher
+
+   Bases: :py:obj:`KeyRefresher`
+
+   This key refresher uses environment variable key. The key is automatically picked up if the
+   user changes the environment variable.
+
+   .. py:property:: key_id
+      :type: str
+
+
+
+.. py:class:: WhyLabsWriter(org_id: Optional[str] = None, api_key: Optional[str] = None, dataset_id: Optional[str] = None, api_client: Optional[whylabs_client.ApiClient] = None, ssl_ca_cert: Optional[str] = None, _timeout_seconds: Optional[float] = None)
+
+   Bases: :py:obj:`whylogs.api.writer.Writer`
+
+   A WhyLogs writer to upload DatasetProfileView's onto the WhyLabs platform.
+
+   >**IMPORTANT**: In order to correctly send your profiles over, make sure you have
+   the following environment variables set: `[WHYLABS_ORG_ID, WHYLABS_API_KEY, WHYLABS_DEFAULT_DATASET_ID]`. You
+   can also set them with the option method or within the constructor, although it
+   is highly recommended you don't persist credentials in code!
+
+   :param org_id: Your organization ID on the WhyLabs platform. If not informed, will get the mentioned environment
+                  variable instead.
+   :type org_id: str, optional
+   :param api_key: The API Key to authenticate with WhyLabs. If not informed, will get the mentioned environment
+                   variable instead.
+   :type api_key: str, optional
+   :param dataset_id: The Dataset ID, often referred to as model ID, that will tie the profile to your tracked data.
+                      If not informed, will get the mentioned environment variable instead.
+   :type dataset_id: str, optional
+
+   :returns:
+   :rtype: None
+
+   .. rubric:: Examples
+
+   An example usage of this method can be represented with the simple code above. Here we
+   are assuming the user has already assigned a pandas.DataFrame to the `df` variable.
+
+   ```python
+   import whylogs as why
+
+   profile = why.log(pandas=df)
+   profile.writer("whylabs").write()
+   ```
+
+   .. py:property:: key_id
+      :type: str
+
+
+   .. py:method:: check_interval(interval_seconds: int) -> None
+
+      Validate an interval configuration for a given writer.
+
+      Some writer only accepts certain interval configuration. By default, this should return True for a valid
+      non-negative interval.
+
+
+   .. py:method:: option(org_id: Optional[str] = None, dataset_id: Optional[str] = None, api_key: Optional[str] = None, reference_profile_name: Optional[str] = None, configuration: Optional[whylabs_client.Configuration] = None, ssl_ca_cert: Optional[str] = None, api_client: Optional[whylabs_client.ApiClient] = None, timeout_seconds: Optional[float] = None) -> WhyLabsWriter
+
+      :param org_id the organization ID:
+      :param dataset_id the dataset Id:
+      :param api_key the API key:
+      :param reference_profile_name the name of the reference profile:
+      :param configuration the additional configuration for the REST client:
+      :param Returns a "WhyLabsWriter" with these options configured:
+      :param -------:
+
+
+   .. py:method:: tag_output_columns(columns: List[str]) -> Tuple[bool, str]
+
+      Sets the list of columns as output columns for the specified dataset.
+
+      :param columns: The list of column names you want to tag as outputs.
+      :type columns: List[str]
+
+      :returns: Tuple with a boolean indicating success or failure: e.g. (True, "column prediction was updated to
+                output") and string with status message.
+      :rtype: Tuple[bool, str]
+
+
+   .. py:method:: tag_input_columns(columns: List[str]) -> Tuple[bool, str]
+
+      Sets the list of columns as input columns for the specified dataset.
+
+      :param columns: The list of column names you want to tag as inputs.
+      :type columns: List[str]
+
+      :returns: Tuple with a boolean indicating success or failure: e.g. (True, "column [output_voltage] updated to
+                input") and string with status message.
+      :rtype: Tuple[bool, str]
+
+
+   .. py:method:: write_estimation_result(file: whylogs.experimental.performance_estimation.estimation_results.EstimationResult, **kwargs: Any) -> Tuple[bool, str]
+
+
+   .. py:method:: write_feature_weights(file: whylogs.core.feature_weights.FeatureWeights, **kwargs: Any) -> Tuple[bool, str]
+
+      Put feature weights for the specified dataset.
+
+      :param file: FeatureWeights object representing the Feature Weights for the specified dataset
+      :type file: FeatureWeights
+
+      :returns: Tuple with a boolean (1-success, 0-fail) and string with the request's status code.
+      :rtype: Tuple[bool, str]
+
+
+   .. py:method:: get_feature_weights(**kwargs: Any) -> Optional[whylogs.core.feature_weights.FeatureWeights]
+
+      Get latest version for the feature weights for the specified dataset
+
+      :returns: Response of the GET request, with segmentWeights and metadata.
+      :rtype: FeatureWeightResponse
+
+
+   .. py:method:: write(file: whylogs.api.writer.writer.Writable, **kwargs: Any) -> Tuple[bool, str]
+
+
+

@@ -1,0 +1,96 @@
+:py:mod:`whylogs.core.metrics.unicode_range`
+============================================
+
+.. py:module:: whylogs.core.metrics.unicode_range
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.metrics.unicode_range.UnicodeRangeMetric
+
+
+
+
+.. py:class:: UnicodeRangeMetric(submetrics: Dict[str, Dict[str, whylogs.core.metrics.Metric]])
+
+   Bases: :py:obj:`whylogs.core.metrics.multimetric.MultiMetric`
+
+   For string values, maintains a DistributionMetric for the counts of
+   characters that fall within user-defined codepoint ranges.
+
+   Parameters
+    ----------
+    range_definitions : Dict[str, Tuple[int, int]]
+        Defines the character ranges to be counted. The key servers as
+        the range name and should only contain alphanumeric, hyphen, and
+        underscore characters. The tuple defines the Unicode codepoint
+        range to be tracked. The string length is tracked under the key
+        "STRING_LENGTH" so don't use that as a range name.
+
+   .. py:property:: namespace
+      :type: str
+
+
+   .. py:attribute:: range_definitions
+      :type: Dict[str, Tuple[int, int]]
+
+      
+
+   .. py:attribute:: lower_case
+      :type: bool
+      :value: True
+
+      
+
+   .. py:attribute:: normalize
+      :type: bool
+      :value: True
+
+      
+
+   .. py:attribute:: submetrics
+      :type: Dict[str, Dict[str, whylogs.core.metrics.Metric]]
+
+      
+
+   .. py:method:: merge(other: UnicodeRangeMetric) -> UnicodeRangeMetric
+
+
+   .. py:method:: columnar_update(view: whylogs.core.preprocessing.PreprocessedColumn) -> whylogs.core.metrics.metrics.OperationResult
+
+
+   .. py:method:: zero(config: Optional[whylogs.core.metrics.metrics.MetricConfig] = None) -> UnicodeRangeMetric
+      :classmethod:
+
+
+   .. py:method:: from_protobuf(msg: whylogs.core.proto.MetricMessage) -> UnicodeRangeMetric
+      :classmethod:
+
+
+   .. py:method:: merge_submetrics(other: MULTI_METRIC) -> Dict[str, Dict[str, whylogs.core.metrics.Metric]]
+
+
+   .. py:method:: to_protobuf() -> whylogs.core.proto.MetricMessage
+
+
+   .. py:method:: get_component_paths() -> List[str]
+
+
+   .. py:method:: to_summary_dict(cfg: Optional[whylogs.core.configs.SummaryConfig] = None) -> Dict[str, Any]
+
+
+   .. py:method:: submetrics_from_protobuf(msg: whylogs.core.proto.MetricMessage) -> Dict[str, Dict[str, whylogs.core.metrics.Metric]]
+      :classmethod:
+
+
+   .. py:method:: get_namespace(config: Optional[MetricConfig] = None) -> str
+      :classmethod:
+
+
+

@@ -1,0 +1,312 @@
+:py:mod:`whylogs.api.logger.result_set`
+=======================================
+
+.. py:module:: whylogs.api.logger.result_set
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.result_set.ResultSetWriter
+   whylogs.api.logger.result_set.ResultSetReader
+   whylogs.api.logger.result_set.ResultSet
+   whylogs.api.logger.result_set.ViewResultSet
+   whylogs.api.logger.result_set.ProfileResultSet
+   whylogs.api.logger.result_set.SegmentedResultSet
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.result_set.logger
+
+
+.. py:data:: logger
+
+   
+
+.. py:class:: ResultSetWriter(results: ResultSet, writer: whylogs.api.writer.Writer)
+
+   Result of a logging call.
+   A result set might contain one or multiple profiles or profile views.
+
+   .. py:method:: option(**kwargs: Any) -> ResultSetWriter
+
+
+   .. py:method:: write(**kwargs: Any) -> None
+
+
+
+.. py:class:: ResultSetReader(reader: whylogs.api.reader.Reader)
+
+   .. py:method:: option(**kwargs: Any) -> ResultSetReader
+
+
+   .. py:method:: read(**kwargs: Any) -> ResultSet
+
+
+
+.. py:class:: ResultSet
+
+   Bases: :py:obj:`abc.ABC`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+   .. py:method:: view() -> Optional[whylogs.core.DatasetProfileView]
+      :abstractmethod:
+
+
+   .. py:method:: profile() -> Optional[whylogs.core.DatasetProfile]
+      :abstractmethod:
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+   .. py:method:: merge(other: ResultSet) -> ResultSet
+      :abstractmethod:
+
+
+
+.. py:class:: ViewResultSet(view: whylogs.core.DatasetProfileView)
+
+   Bases: :py:obj:`ResultSet`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: profile() -> Optional[whylogs.core.DatasetProfile]
+
+
+   .. py:method:: view() -> Optional[whylogs.core.DatasetProfileView]
+
+
+   .. py:method:: zero() -> ViewResultSet
+      :staticmethod:
+
+
+   .. py:method:: merge(other: ResultSet) -> ViewResultSet
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+
+.. py:class:: ProfileResultSet(profile: whylogs.core.DatasetProfile)
+
+   Bases: :py:obj:`ResultSet`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: profile() -> Optional[whylogs.core.DatasetProfile]
+
+
+   .. py:method:: view() -> Optional[whylogs.core.DatasetProfileView]
+
+
+   .. py:method:: zero() -> ProfileResultSet
+      :staticmethod:
+
+
+   .. py:method:: merge(other: ResultSet) -> ViewResultSet
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+
+.. py:class:: SegmentedResultSet(segments: Dict[str, Dict[whylogs.core.Segment, Union[whylogs.core.DatasetProfile, whylogs.core.DatasetProfileView]]], partitions: Optional[List[whylogs.core.segmentation_partition.SegmentationPartition]] = None, metrics: Optional[Dict[str, Any]] = None, properties: Optional[Dict[str, Any]] = None)
+
+   Bases: :py:obj:`ResultSet`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: dataset_properties
+      :type: Optional[Dict[str, Any]]
+
+
+   .. py:property:: dataset_metrics
+      :type: Optional[Dict[str, Any]]
+
+
+   .. py:property:: partitions
+      :type: Optional[List[whylogs.core.segmentation_partition.SegmentationPartition]]
+
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: model_performance_metric
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: profile(segment: Optional[whylogs.core.Segment] = None) -> Optional[Union[whylogs.core.DatasetProfile, whylogs.core.DatasetProfileView]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: segments(restrict_to_parition_id: Optional[str] = None) -> Optional[List[whylogs.core.Segment]]
+
+
+   .. py:method:: segments_in_partition(partition: whylogs.core.segmentation_partition.SegmentationPartition) -> Optional[Dict[whylogs.core.Segment, Union[whylogs.core.DatasetProfile, whylogs.core.DatasetProfileView]]]
+
+
+   .. py:method:: view(segment: Optional[whylogs.core.Segment] = None) -> Optional[whylogs.core.DatasetProfileView]
+
+
+   .. py:method:: get_model_performance_metrics_for_segment(segment: whylogs.core.Segment) -> Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: add_metrics_for_segment(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics, segment: whylogs.core.Segment) -> None
+
+
+   .. py:method:: zero() -> SegmentedResultSet
+      :staticmethod:
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+   .. py:method:: merge(other: ResultSet) -> SegmentedResultSet
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+

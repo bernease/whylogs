@@ -1,0 +1,125 @@
+:py:mod:`whylogs.viz.drift.configs`
+===================================
+
+.. py:module:: whylogs.viz.drift.configs
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.viz.drift.configs.DriftCategory
+   whylogs.viz.drift.configs.DriftThresholds
+   whylogs.viz.drift.configs.KSTestConfig
+   whylogs.viz.drift.configs.HellingerConfig
+   whylogs.viz.drift.configs.ChiSquareConfig
+
+
+
+
+.. py:class:: DriftCategory
+
+   Bases: :py:obj:`enum.Enum`
+
+   Generic enumeration.
+
+   Derive from this class to define new enumerations.
+
+   .. py:attribute:: NO_DRIFT
+      :value: 0
+
+      
+
+   .. py:attribute:: POSSIBLE_DRIFT
+      :value: 1
+
+      
+
+   .. py:attribute:: DRIFT
+      :value: 2
+
+      
+
+   .. py:method:: name()
+
+      The name of the Enum member.
+
+
+   .. py:method:: value()
+
+      The value of the Enum member.
+
+
+
+.. py:class:: DriftThresholds
+
+   .. py:attribute:: NO_DRIFT
+      :type: tuple
+
+      
+
+   .. py:attribute:: DRIFT
+      :type: tuple
+
+      
+
+   .. py:attribute:: POSSIBLE_DRIFT
+      :type: Optional[tuple]
+
+      
+
+   .. py:method:: to_dict()
+
+
+
+.. py:class:: KSTestConfig
+
+   .. py:attribute:: quantiles
+      :type: List[float]
+
+      
+
+   .. py:attribute:: thresholds
+      :type: DriftThresholds
+
+      
+
+
+.. py:class:: HellingerConfig
+
+   .. py:attribute:: max_hist_buckets
+      :type: int
+      :value: 30
+
+      
+
+   .. py:attribute:: hist_avg_number_per_bucket
+      :type: int
+      :value: 4
+
+      
+
+   .. py:attribute:: min_n_buckets
+      :type: int
+      :value: 2
+
+      
+
+   .. py:attribute:: thresholds
+      :type: DriftThresholds
+
+      
+
+
+.. py:class:: ChiSquareConfig
+
+   .. py:attribute:: thresholds
+      :type: DriftThresholds
+
+      
+
+

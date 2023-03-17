@@ -1,0 +1,176 @@
+:py:mod:`whylogs.api.store`
+===========================
+
+.. py:module:: whylogs.api.store
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   local_store/index.rst
+   profile_store/index.rst
+   query/index.rst
+   sqlite_store/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.store.LocalStore
+   whylogs.api.store.ProfileStore
+   whylogs.api.store.DatasetIdQuery
+   whylogs.api.store.DateQuery
+   whylogs.api.store.SQLiteStore
+
+
+
+
+.. py:class:: LocalStore
+
+   Bases: :py:obj:`whylogs.api.store.profile_store.ProfileStore`
+
+   The LocalStore is the implementation of the base :class:ProfileStore
+   that will manage reading and writing profiles on the local file system.
+
+   In order to instantiate the object, you will need to define a dataset_id,
+   which is related to the name of the model or dataset you're profiling.
+   To properly use the LocalStore to generate files, you should append it
+   to your existing Rolling Logger, as the below example demonstrates.
+
+   ```python
+   import whylogs as why
+   from whylogs.api.store.local import LocalStore
+
+   logger = why.logger(mode="rolling", interval=10, when="S", base_name="my_model")
+   logger.append_store(store=LocalStore())
+
+   new_df = model.predict(input_data)
+   logger.log(new_df)
+   ```
+
+   The above piece of code will make sure to write the logged profiles
+   to the correct location that can be further fetched using the same
+   LocalStore, like so:
+
+   ```python
+   from datetime import datetime, timedelta
+
+   from whylogs.api.store.date_config import DateConfig
+
+   store = LocalStore()
+   query = DateQuery(
+       dataset_id="my_model",
+       start_date = datetime.now(timezone.utc) - timedelta(days=7),
+       end_date = datetime.now(timezone.utc)
+   )
+
+   profile_view = store.get(query=query)
+   ```
+
+   This will fetch all existing profiles from `my_model` from the past
+   7 days in a single merged DatasetProfileView.
+
+   To list existing profiles on your local ProfileStore, you can do:
+
+   ```python
+   store = LocalStore()
+   store.list()
+   ```
+
+   >**NOTE**: The parameter `dataset_id` should always use the snake_case pattern,
+   and it must also be **unique** to your existing dataset/ML model.
+   If you use the same `dataset_id` to store different profiles,
+   you will end up mixing those profiles and not being able to fetch and get
+   them properly again.
+
+   .. py:method:: list() -> List[str]
+
+
+   .. py:method:: get(query: Union[whylogs.api.store.query.DateQuery, whylogs.api.store.query.DatasetIdQuery]) -> Optional[whylogs.core.DatasetProfileView]
+
+
+   .. py:method:: write(profile_view: whylogs.core.DatasetProfileView, dataset_id: str) -> None
+
+
+
+.. py:class:: ProfileStore
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: list() -> List[str]
+      :abstractmethod:
+
+
+   .. py:method:: get(query: whylogs.api.store.query.BaseQuery) -> whylogs.core.DatasetProfileView
+      :abstractmethod:
+
+
+   .. py:method:: write(profile_view: whylogs.core.DatasetProfileView, dataset_id: str) -> None
+      :abstractmethod:
+
+
+
+.. py:class:: DatasetIdQuery
+
+   .. py:attribute:: dataset_id
+      :type: str
+
+      
+
+   .. py:attribute:: segment_tag
+      :type: Optional[str]
+
+      
+
+
+.. py:class:: DateQuery
+
+   .. py:attribute:: dataset_id
+      :type: str
+
+      
+
+   .. py:attribute:: start_date
+      :type: datetime.datetime
+
+      
+
+   .. py:attribute:: end_date
+      :type: Optional[datetime.datetime]
+
+      
+
+   .. py:attribute:: segment_tag
+      :type: Optional[str]
+
+      
+
+
+.. py:class:: SQLiteStore
+
+   Bases: :py:obj:`whylogs.api.store.ProfileStore`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: list()
+
+
+   .. py:method:: get(query: whylogs.api.store.query.BaseQuery) -> whylogs.core.DatasetProfileView
+
+
+   .. py:method:: write(profile_view: whylogs.core.DatasetProfileView, dataset_id: str)
+
+
+

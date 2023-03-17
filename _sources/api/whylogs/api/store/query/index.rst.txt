@@ -1,0 +1,68 @@
+:py:mod:`whylogs.api.store.query`
+=================================
+
+.. py:module:: whylogs.api.store.query
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.store.query.DateQuery
+   whylogs.api.store.query.DatasetIdQuery
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.store.query.BaseQuery
+
+
+.. py:class:: DateQuery
+
+   .. py:attribute:: dataset_id
+      :type: str
+
+      
+
+   .. py:attribute:: start_date
+      :type: datetime.datetime
+
+      
+
+   .. py:attribute:: end_date
+      :type: Optional[datetime.datetime]
+
+      
+
+   .. py:attribute:: segment_tag
+      :type: Optional[str]
+
+      
+
+
+.. py:class:: DatasetIdQuery
+
+   .. py:attribute:: dataset_id
+      :type: str
+
+      
+
+   .. py:attribute:: segment_tag
+      :type: Optional[str]
+
+      
+
+
+.. py:data:: BaseQuery
+
+   
+

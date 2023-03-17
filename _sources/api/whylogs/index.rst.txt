@@ -1,0 +1,228 @@
+:py:mod:`whylogs`
+=================
+
+.. py:module:: whylogs
+
+.. autoapi-nested-parse::
+
+   whylogs is an open source library for logging any kind of data. With whylogs, users are able to generate summaries
+   of their datasets (called whylogs profiles) which they can use to:
+
+   * Track changes in their dataset
+   * Create data constraints to know whether their data looks they way it should
+   * Quickly visualize key summary statistics about their datasets
+
+   These three functionalities enable a variety of use cases for data scientists, machine learning engineers, and
+    data engineers:
+
+   * Detecting data drift (and resultant ML model performance degradation)
+   * Data quality validation
+   * Exploratory data analysis via data profiling
+   * Tracking data for ML experiments
+   * And many more...
+
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   api/index.rst
+   core/index.rst
+   datasets/index.rst
+   experimental/index.rst
+   migration/index.rst
+   viz/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.ResultSet
+   whylogs.DatasetProfileView
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.log
+   whylogs.log_classification_metrics
+   whylogs.log_regression_metrics
+   whylogs.profiling
+   whylogs.read
+   whylogs.write
+   whylogs.v0_to_v1_view
+   whylogs.package_version
+
+
+
+.. py:class:: ResultSet
+
+   Bases: :py:obj:`abc.ABC`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+   .. py:method:: view() -> Optional[whylogs.core.DatasetProfileView]
+      :abstractmethod:
+
+
+   .. py:method:: profile() -> Optional[whylogs.core.DatasetProfile]
+      :abstractmethod:
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+   .. py:method:: merge(other: ResultSet) -> ResultSet
+      :abstractmethod:
+
+
+
+.. py:function:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None) -> result_set.ResultSet
+
+
+.. py:function:: log_classification_metrics(data: whylogs.core.stubs.pd.DataFrame, target_column: str, prediction_column: str, score_column: Optional[str] = None, schema: Optional[whylogs.core.DatasetSchema] = None, log_full_data: bool = False) -> result_set.ProfileResultSet
+
+   Function to track metrics based on validation data.
+   user may also pass the associated attribute names associated with
+   target, prediction, and/or score.
+   :param targets: actual validated values
+   :type targets: List[Union[str, bool, float, int]]
+   :param predictions: inferred/predicted values
+   :type predictions: List[Union[str, bool, float, int]]
+   :param scores: assocaited scores for each inferred, all values set to 1 if not
+                  passed
+   :type scores: List[float], optional
+
+
+.. py:function:: log_regression_metrics(data: whylogs.core.stubs.pd.DataFrame, target_column: str, prediction_column: str, schema: Optional[whylogs.core.DatasetSchema] = None, log_full_data: bool = False) -> result_set.ProfileResultSet
+
+   Function to track regression metrics based on validation data.
+   user may also pass the associated attribute names associated with
+   target, prediction, and/or score.
+   :param targets: actual validated values
+   :type targets: List[Union[str, bool, float, int]]
+   :param predictions: inferred/predicted values
+   :type predictions: List[Union[str, bool, float, int]]
+   :param scores: assocaited scores for each inferred, all values set to 1 if not
+                  passed
+   :type scores: List[float], optional
+
+
+.. py:function:: profiling(*, schema: Optional[whylogs.core.DatasetSchema] = None)
+
+
+.. py:function:: read(path: str) -> result_set.ResultSet
+
+
+.. py:function:: write(profile: whylogs.core.DatasetProfile, base_dir: str) -> None
+
+
+.. py:class:: DatasetProfileView(*, columns: Dict[str, whylogs.core.view.column_profile_view.ColumnProfileView], dataset_timestamp: Optional[datetime.datetime], creation_timestamp: Optional[datetime.datetime], metrics: Optional[Dict[str, Any]] = None, metadata: Optional[Dict[str, str]] = None)
+
+   Bases: :py:obj:`whylogs.api.writer.writer.Writable`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:property:: dataset_timestamp
+      :type: Optional[datetime.datetime]
+
+
+   .. py:property:: creation_timestamp
+      :type: Optional[datetime.datetime]
+
+
+   .. py:property:: model_performance_metrics
+      :type: Any
+
+
+   .. py:method:: add_model_performance_metrics(metric: Any) -> None
+
+
+   .. py:method:: merge(other: DatasetProfileView) -> DatasetProfileView
+
+
+   .. py:method:: get_column(col_name: str) -> Optional[whylogs.core.view.column_profile_view.ColumnProfileView]
+
+
+   .. py:method:: get_columns(col_names: Optional[List[str]] = None) -> Dict[str, whylogs.core.view.column_profile_view.ColumnProfileView]
+
+
+   .. py:method:: get_default_path() -> str
+
+
+   .. py:method:: write(path: Optional[str] = None, **kwargs: Any) -> Tuple[bool, str]
+
+
+   .. py:method:: serialize() -> bytes
+
+
+   .. py:method:: zero() -> DatasetProfileView
+      :classmethod:
+
+
+   .. py:method:: deserialize(data: bytes) -> DatasetProfileView
+      :classmethod:
+
+
+   .. py:method:: read(path: str) -> DatasetProfileView
+      :classmethod:
+
+
+   .. py:method:: to_pandas(column_metric: Optional[str] = None, cfg: Optional[whylogs.core.configs.SummaryConfig] = None) -> whylogs.core.stubs.pd.DataFrame
+
+
+
+.. py:function:: v0_to_v1_view(msg: whylogs.core.proto.v0.DatasetProfileMessageV0, allow_partial: bool = False) -> whylogs.core.DatasetProfileView
+
+
+.. py:function:: package_version(package: str = __package__) -> str
+
+   Calculate version number based on pyproject.toml
+
+

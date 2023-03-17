@@ -1,0 +1,44 @@
+:py:mod:`whylogs.migration.uncompound`
+======================================
+
+.. py:module:: whylogs.migration.uncompound
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.migration.uncompound.ImageMetric
+   whylogs.migration.uncompound.FeatureFlags
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.migration.uncompound.logger
+
+
+.. py:class:: ImageMetric
+
+
+.. py:data:: logger
+
+   
+
+.. py:class:: FeatureFlags
+
+   .. py:attribute:: uncompound_condition_count
+      :type: bool
+      :value: False
+
+      
+
+

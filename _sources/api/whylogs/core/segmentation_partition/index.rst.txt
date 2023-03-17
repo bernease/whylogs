@@ -1,0 +1,123 @@
+:py:mod:`whylogs.core.segmentation_partition`
+=============================================
+
+.. py:module:: whylogs.core.segmentation_partition
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.segmentation_partition.ColumnMapperFunction
+   whylogs.core.segmentation_partition.SegmentFilter
+   whylogs.core.segmentation_partition.SegmentationPartition
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.segmentation_partition.segment_on_column
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.segmentation_partition.logger
+   whylogs.core.segmentation_partition.MAX_SEGMENTS_ERROR_THRESHOLD
+   whylogs.core.segmentation_partition.MAX_SEGMENTS_WARNING_THRESHOLD
+
+
+.. py:data:: logger
+
+   
+
+.. py:data:: MAX_SEGMENTS_ERROR_THRESHOLD
+   :value: 2000
+
+   
+
+.. py:data:: MAX_SEGMENTS_WARNING_THRESHOLD
+   :value: 200
+
+   
+
+.. py:class:: ColumnMapperFunction
+
+   .. py:attribute:: col_names
+      :type: Optional[List[str]]
+
+      
+
+   .. py:attribute:: map
+      :type: Optional[Callable]
+
+      
+
+   .. py:attribute:: field_projector
+      :type: whylogs.core.projectors.FieldProjector
+
+      
+
+   .. py:attribute:: id
+      :type: str
+
+      
+
+
+.. py:class:: SegmentFilter
+
+   .. py:attribute:: filter_function
+      :type: Optional[Callable]
+
+      
+
+   .. py:attribute:: query_string
+      :type: Optional[str]
+
+      
+
+
+.. py:class:: SegmentationPartition
+
+   .. py:property:: simple
+      :type: bool
+
+
+   .. py:property:: filter_id
+      :type: str
+
+
+   .. py:attribute:: name
+      :type: str
+
+      
+
+   .. py:attribute:: mapper
+      :type: Optional[ColumnMapperFunction]
+
+      
+
+   .. py:attribute:: id
+      :type: str
+
+      
+
+   .. py:attribute:: filter
+      :type: Optional[SegmentFilter]
+
+      
+
+
+.. py:function:: segment_on_column(column_name: str) -> Mapping[str, SegmentationPartition]
+
+

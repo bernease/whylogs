@@ -1,0 +1,652 @@
+:py:mod:`whylogs.core`
+======================
+
+.. py:module:: whylogs.core
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   constraints/index.rst
+   metrics/index.rst
+   model_performance_metrics/index.rst
+   proto/index.rst
+   validators/index.rst
+   view/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   column_profile/index.rst
+   common/index.rst
+   configs/index.rst
+   dataset_profile/index.rst
+   datatypes/index.rst
+   errors/index.rst
+   feature_weights/index.rst
+   input_resolver/index.rst
+   metric_getters/index.rst
+   predicate_parser/index.rst
+   preprocessing/index.rst
+   projectors/index.rst
+   relations/index.rst
+   resolvers/index.rst
+   schema/index.rst
+   segment/index.rst
+   segmentation_partition/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.ColumnProfile
+   whylogs.core.DatasetProfile
+   whylogs.core.TypeMapper
+   whylogs.core.MetricGetter
+   whylogs.core.ProfileGetter
+   whylogs.core.MetricConfig
+   whylogs.core.ModelPerformanceMetrics
+   whylogs.core.Predicate
+   whylogs.core.Resolver
+   whylogs.core.ColumnSchema
+   whylogs.core.DatasetSchema
+   whylogs.core.Segment
+   whylogs.core.SegmentationPartition
+   whylogs.core.ColumnProfileView
+   whylogs.core.DatasetProfileView
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.Not
+   whylogs.core.Require
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.core.WHYLOGS_MAGIC_HEADER
+
+
+.. py:class:: ColumnProfile(name: str, schema: whylogs.core.schema.ColumnSchema, cache_size: int)
+
+   Bases: :py:obj:`object`
+
+   .. py:method:: add_metric(metric: whylogs.core.metrics.Metric) -> None
+
+
+   .. py:method:: track(row: Dict[str, Any]) -> None
+
+
+   .. py:method:: flush() -> None
+
+      Force emptying the cache and update the internal metrics.
+
+
+   .. py:method:: track_column(series: Any) -> None
+
+
+   .. py:method:: to_protobuf() -> whylogs.core.proto.ColumnMessage
+
+
+   .. py:method:: view() -> whylogs.core.view.ColumnProfileView
+
+
+
+.. py:class:: DatasetProfile(schema: Optional[whylogs.core.schema.DatasetSchema] = None, dataset_timestamp: Optional[datetime.datetime] = None, creation_timestamp: Optional[datetime.datetime] = None, metrics: Optional[Dict[str, Union[whylogs.core.metrics.Metric, Any]]] = None)
+
+   Bases: :py:obj:`whylogs.api.writer.writer.Writable`
+
+   Dataset profile represents a collection of in-memory profiling stats for a dataset.
+
+   :param schema: :class:`DatasetSchema`, optional
+                  An object that represents the data column names and types
+   :param dataset_timestamp: int, optional
+                             A timestamp integer that best represents the date tied to the dataset generation.
+                             i.e.: A January 1st 2019 Sales Dataset will have 1546300800000 as the timestamp in miliseconds (UTC).
+                             If None is provided, it will take the current timestamp as default
+   :param creation_timestamp: int, optional
+                              The timestamp tied to the exact moment when the :class:`DatasetProfile` is created.
+                              If None is provided, it will take the current timestamp as default
+
+   .. py:property:: creation_timestamp
+      :type: datetime.datetime
+
+
+   .. py:property:: dataset_timestamp
+      :type: datetime.datetime
+
+
+   .. py:property:: is_active
+      :type: bool
+
+      Returns True if the profile tracking code is currently running.
+
+   .. py:property:: is_empty
+      :type: bool
+
+      Returns True if the profile tracking code is currently running.
+
+   .. py:property:: model_performance_metrics
+      :type: whylogs.core.model_performance_metrics.model_performance_metrics.ModelPerformanceMetrics
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_metric(col_name: str, metric: whylogs.core.metrics.Metric) -> None
+
+
+   .. py:method:: add_dataset_metric(name: str, metric: whylogs.core.metrics.Metric) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metric: whylogs.core.model_performance_metrics.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: track(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Mapping[str, Any]] = None) -> None
+
+
+   .. py:method:: view() -> whylogs.core.view.DatasetProfileView
+
+
+   .. py:method:: flush() -> None
+
+
+   .. py:method:: get_default_path(path) -> str
+      :staticmethod:
+
+
+   .. py:method:: write(path: Optional[str] = None, **kwargs: Any) -> Tuple[bool, str]
+
+
+   .. py:method:: read(input_path: str) -> whylogs.core.view.DatasetProfileView
+      :classmethod:
+
+
+
+.. py:class:: TypeMapper
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+
+.. py:class:: MetricGetter(metric: whylogs.core.metrics.metrics.Metric, path: str)
+
+   Bases: :py:obj:`whylogs.core.relations.ValueGetter`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: serialize() -> str
+
+
+
+.. py:class:: ProfileGetter(profile: Union[whylogs.core.dataset_profile.DatasetProfile, whylogs.core.view.dataset_profile_view.DatasetProfileView], column_name: str, path: str)
+
+   Bases: :py:obj:`whylogs.core.relations.ValueGetter`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: serialize() -> str
+
+
+
+.. py:class:: MetricConfig
+
+   .. py:attribute:: hll_lg_k
+      :type: int
+      :value: 12
+
+      
+
+   .. py:attribute:: kll_k
+      :type: int
+      :value: 256
+
+      
+
+   .. py:attribute:: fi_lg_max_k
+      :type: int
+      :value: 10
+
+      
+
+   .. py:attribute:: fi_disabled
+      :type: bool
+      :value: False
+
+      
+
+   .. py:attribute:: track_unicode_ranges
+      :type: bool
+      :value: False
+
+      
+
+   .. py:attribute:: large_kll_k
+      :type: bool
+      :value: True
+
+      
+
+   .. py:attribute:: kll_k_large
+      :type: int
+      :value: 1024
+
+      
+
+   .. py:attribute:: unicode_ranges
+      :type: Dict[str, Tuple[int, int]]
+
+      
+
+   .. py:attribute:: lower_case
+      :type: bool
+      :value: True
+
+      
+
+   .. py:attribute:: normalize
+      :type: bool
+      :value: True
+
+      
+
+   .. py:attribute:: max_frequent_item_size
+      :type: int
+      :value: 128
+
+      
+
+
+.. py:class:: ModelPerformanceMetrics(confusion_matrix: Optional[whylogs.core.model_performance_metrics.confusion_matrix.ConfusionMatrix] = None, regression_metrics: Optional[whylogs.core.model_performance_metrics.regression_metrics.RegressionMetrics] = None, metrics: Optional[Dict[str, whylogs.core.metrics.metrics.Metric]] = None, field_metadata: Optional[Dict[str, Set[str]]] = None)
+
+   Container class for various model-related performance metrics
+
+   .. attribute:: confusion_matrix
+
+      ConfusionMatrix which keeps it track of counts with NumberTracker
+
+      :type: ConfusionMatrix
+
+   .. attribute:: regression_metrics
+
+      Regression Metrics keeps track of a common regression metrics in case the targets are continous.
+
+      :type: RegressionMetrics
+
+   .. py:property:: output_fields
+      :type: Optional[List[str]]
+
+
+   .. py:method:: to_protobuf() -> whylogs.core.proto.v0.ModelProfileMessage
+
+
+   .. py:method:: from_protobuf(message: whylogs.core.proto.v0.ModelProfileMessage) -> ModelPerformanceMetrics
+      :classmethod:
+
+
+   .. py:method:: compute_confusion_matrix(predictions: List[Union[str, int, bool, float]], targets: List[Union[str, int, bool, float]], scores: Optional[List[float]] = None)
+
+      computes the confusion_matrix, if one is already present merges to old one.
+
+      :param predictions:
+      :type predictions: List[Union[str, int, bool]]
+      :param targets:
+      :type targets: List[Union[str, int, bool]]
+      :param scores:
+      :type scores: List[float], optional
+
+
+   .. py:method:: compute_regression_metrics(predictions: List[Union[float, int]], targets: List[Union[float, int]])
+
+
+   .. py:method:: add_metadata_to_field(column_name: str, categories: Set[str]) -> None
+
+
+   .. py:method:: specify_output_fields(column_names: Union[str, Set[str]]) -> None
+
+
+   .. py:method:: merge(other) -> ModelPerformanceMetrics
+
+      :type other: ModelMetrics
+
+
+
+.. py:function:: Not(p: Predicate) -> Predicate
+
+
+.. py:class:: Predicate(op: Relation = Relation.no_op, value: Union[str, int, float, ValueGetter] = 0, udf: Optional[Callable[[Any], bool]] = None, left: Optional[Predicate] = None, right: Optional[Predicate] = None, component: Optional[str] = None)
+
+   .. py:property:: not_
+      :type: Predicate
+
+
+   .. py:method:: matches(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: fullmatch(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: equals(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: less_than(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: less_or_equals(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: greater_than(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: greater_or_equals(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: not_equal(value: Union[str, int, float, ValueGetter]) -> Predicate
+
+
+   .. py:method:: and_(right: Predicate) -> Predicate
+
+
+   .. py:method:: or_(right: Predicate) -> Predicate
+
+
+   .. py:method:: is_(udf: Callable[[Any], bool]) -> Predicate
+
+
+   .. py:method:: serialize() -> str
+
+
+
+.. py:function:: Require(component: Optional[str] = None) -> Predicate
+
+
+.. py:class:: Resolver
+
+   Bases: :py:obj:`abc.ABC`
+
+   A resolver maps from a column name and a data type to trackers.
+
+   Note that the key of the result dictionaries defines the namespaces of the metrics in the serialized form.
+
+   .. py:method:: resolve(name: str, why_type: whylogs.core.datatypes.DataType, column_schema: ColumnSchema) -> Dict[str, whylogs.core.metrics.metrics.Metric]
+      :abstractmethod:
+
+
+
+.. py:class:: ColumnSchema
+
+   Schema of a column.
+
+   The main goal is to specify the data type.
+   On top of that, users can configure their own tracker resolution logic (mapping a type to a list of tracker
+   factories) and any additional trackers here.
+
+   .. py:attribute:: dtype
+      :type: Any
+
+      
+
+   .. py:attribute:: cfg
+      :type: whylogs.core.metrics.metrics.MetricConfig
+
+      
+
+   .. py:attribute:: type_mapper
+      :type: whylogs.core.datatypes.TypeMapper
+
+      
+
+   .. py:attribute:: resolver
+      :type: whylogs.core.resolvers.Resolver
+
+      
+
+   .. py:attribute:: validators
+      :type: Dict[str, List[whylogs.core.validators.validator.Validator]]
+
+      
+
+   .. py:method:: get_metrics(name: str) -> Dict[str, whylogs.core.metrics.metrics.Metric]
+
+
+   .. py:method:: get_validators(name: str) -> List[Optional[whylogs.core.validators.validator.Validator]]
+
+
+
+.. py:class:: DatasetSchema(types: Optional[Dict[str, Any]] = None, default_configs: Optional[whylogs.core.metrics.metrics.MetricConfig] = None, type_mapper: Optional[whylogs.core.datatypes.TypeMapper] = None, resolvers: Optional[whylogs.core.resolvers.Resolver] = None, cache_size: int = 1024, schema_based_automerge: bool = False, segments: Optional[Dict[str, whylogs.core.segmentation_partition.SegmentationPartition]] = None, validators: Optional[Dict[str, List[whylogs.core.validators.validator.Validator]]] = None)
+
+   Defines the schema for tracking metrics in whylogs.
+
+   In order to customize your tracking, you can extend this class to specify your own column schema
+   or your own type resolution. Otherwise, you can just use the default DatasetSchema object.
+
+   Schema objects are also used to group datasets together.
+
+   .. attribute:: types
+
+      required. a dictionay of column name to the Python type.
+
+   .. attribute:: default_configs
+
+      optional. Options to configure various behavior of whylogs.
+
+   .. attribute:: type_mapper
+
+      Optional. a mapper that transates the Python type to standardized whylogs :class:`DataType` object.
+
+   .. attribute:: resolvers
+
+      Optional. an object that defines how to map from a column name, a whylogs :class:`DataType` and a
+      schema to metrics.
+
+   .. rubric:: Examples
+
+   >>> import pandas as pd
+   >>> import numpy as np
+   >>> from whylogs.core import DatasetSchema, DatasetProfile
+   >>> from whylogs.core.resolvers import Resolver, StandardResolver
+   >>>
+   >>> class MyResolver(StandardResolver):
+   ...    pass
+   >>>
+   >>> schema = DatasetSchema(
+   ...    types={
+   ...        "col1": str,
+   ...        "col2": np.int32,
+   ...        "col3": pd.CategoricalDtype(categories=('foo', 'bar'), ordered=True)
+   ...    },
+   ...    resolvers=MyResolver()
+   ... )
+   >>> prof = DatasetProfile(schema)
+   >>> df = pd.DataFrame({"col1": ['foo'], "col2": np.array([1], dtype=np.int32), "col3": ['bar']})
+   >>> prof.track(pandas=df)
+
+   .. py:method:: copy() -> DatasetSchema
+
+      Returns a new instance of the same underlying schema
+
+
+   .. py:method:: resolve(*, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Mapping[str, Any]] = None) -> bool
+
+
+   .. py:method:: get_col_names() -> tuple
+
+
+   .. py:method:: get(name: str) -> Optional[ColumnSchema]
+
+
+
+.. py:class:: Segment
+
+   .. py:attribute:: key
+      :type: Tuple[str, Ellipsis]
+
+      
+
+   .. py:attribute:: parent_id
+      :type: str
+
+      
+
+
+.. py:class:: SegmentationPartition
+
+   .. py:property:: simple
+      :type: bool
+
+
+   .. py:property:: filter_id
+      :type: str
+
+
+   .. py:attribute:: name
+      :type: str
+
+      
+
+   .. py:attribute:: mapper
+      :type: Optional[ColumnMapperFunction]
+
+      
+
+   .. py:attribute:: id
+      :type: str
+
+      
+
+   .. py:attribute:: filter
+      :type: Optional[SegmentFilter]
+
+      
+
+
+.. py:data:: WHYLOGS_MAGIC_HEADER
+   :value: 'WHY1'
+
+   
+
+.. py:class:: ColumnProfileView(metrics: Dict[str, METRIC], success_count: int = 0, failure_count: int = 0)
+
+   Bases: :py:obj:`object`
+
+   .. py:method:: merge(other: ColumnProfileView) -> ColumnProfileView
+
+
+   .. py:method:: serialize() -> bytes
+
+
+   .. py:method:: deserialize(serialized_profile: bytes) -> ColumnProfileView
+      :classmethod:
+
+
+   .. py:method:: get_metric(m_name: str) -> Optional[METRIC]
+
+
+   .. py:method:: to_protobuf() -> whylogs.core.proto.ColumnMessage
+
+
+   .. py:method:: get_metric_component_paths() -> List[str]
+
+
+   .. py:method:: get_metric_names() -> List[str]
+
+
+   .. py:method:: get_metrics() -> List[whylogs.core.metrics.metrics.Metric]
+
+
+   .. py:method:: to_summary_dict(*, column_metric: Optional[str] = None, cfg: Optional[whylogs.core.configs.SummaryConfig] = None) -> Dict[str, Any]
+
+
+   .. py:method:: zero(msg: whylogs.core.proto.ColumnMessage) -> ColumnProfileView
+      :classmethod:
+
+
+   .. py:method:: from_protobuf(msg: whylogs.core.proto.ColumnMessage) -> ColumnProfileView
+      :classmethod:
+
+
+   .. py:method:: from_bytes(data: bytes) -> ColumnProfileView
+      :classmethod:
+
+
+
+.. py:class:: DatasetProfileView(*, columns: Dict[str, whylogs.core.view.column_profile_view.ColumnProfileView], dataset_timestamp: Optional[datetime.datetime], creation_timestamp: Optional[datetime.datetime], metrics: Optional[Dict[str, Any]] = None, metadata: Optional[Dict[str, str]] = None)
+
+   Bases: :py:obj:`whylogs.api.writer.writer.Writable`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:property:: dataset_timestamp
+      :type: Optional[datetime.datetime]
+
+
+   .. py:property:: creation_timestamp
+      :type: Optional[datetime.datetime]
+
+
+   .. py:property:: model_performance_metrics
+      :type: Any
+
+
+   .. py:method:: add_model_performance_metrics(metric: Any) -> None
+
+
+   .. py:method:: merge(other: DatasetProfileView) -> DatasetProfileView
+
+
+   .. py:method:: get_column(col_name: str) -> Optional[whylogs.core.view.column_profile_view.ColumnProfileView]
+
+
+   .. py:method:: get_columns(col_names: Optional[List[str]] = None) -> Dict[str, whylogs.core.view.column_profile_view.ColumnProfileView]
+
+
+   .. py:method:: get_default_path() -> str
+
+
+   .. py:method:: write(path: Optional[str] = None, **kwargs: Any) -> Tuple[bool, str]
+
+
+   .. py:method:: serialize() -> bytes
+
+
+   .. py:method:: zero() -> DatasetProfileView
+      :classmethod:
+
+
+   .. py:method:: deserialize(data: bytes) -> DatasetProfileView
+      :classmethod:
+
+
+   .. py:method:: read(path: str) -> DatasetProfileView
+      :classmethod:
+
+
+   .. py:method:: to_pandas(column_metric: Optional[str] = None, cfg: Optional[whylogs.core.configs.SummaryConfig] = None) -> whylogs.core.stubs.pd.DataFrame
+
+
+

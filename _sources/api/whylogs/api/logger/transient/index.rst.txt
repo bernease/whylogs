@@ -1,0 +1,48 @@
+:py:mod:`whylogs.api.logger.transient`
+======================================
+
+.. py:module:: whylogs.api.logger.transient
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.transient.TransientLogger
+
+
+
+
+.. py:class:: TransientLogger(schema: Optional[whylogs.core.DatasetSchema] = None)
+
+   Bases: :py:obj:`whylogs.api.logger.logger.Logger`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: check_writer(_: whylogs.api.writer.Writer) -> None
+
+      Checks if a writer is configured correctly for this class
+
+
+   .. py:method:: append_writer(name: Optional[str] = None, *, writer: Optional[whylogs.api.writer.Writer] = None, **kwargs: Any) -> None
+
+
+   .. py:method:: append_store(store: whylogs.api.store.ProfileStore) -> None
+
+
+   .. py:method:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None, timestamp_ms: Optional[int] = None) -> whylogs.api.logger.result_set.ResultSet
+
+      :param timestamp_ms: The timestamp of the data being logged. This defaults to now if it isn't provided.
+                           This is used to determine what the dataset timestamp should be. For an hourly model, the dataset
+                           timestamp will end up being the start of the hour of the provided timestamp_ms, UTC.
+
+
+   .. py:method:: close() -> None
+
+
+

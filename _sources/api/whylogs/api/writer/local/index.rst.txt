@@ -1,0 +1,53 @@
+:py:mod:`whylogs.api.writer.local`
+==================================
+
+.. py:module:: whylogs.api.writer.local
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.writer.local.LocalWriter
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.writer.local.logger
+
+
+.. py:data:: logger
+
+   
+
+.. py:class:: LocalWriter(base_dir: Optional[str] = None, base_name: Optional[str] = None)
+
+   Bases: :py:obj:`whylogs.api.writer.Writer`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: write(file: whylogs.api.writer.writer.Writable, dest: Optional[str] = None, **kwargs: Any) -> Tuple[bool, str]
+
+
+   .. py:method:: option(base_dir: Optional[str] = None, base_name: Optional[str] = None) -> LocalWriter
+
+
+   .. py:method:: check_interval(interval_seconds: int) -> None
+
+      Validate an interval configuration for a given writer.
+
+      Some writer only accepts certain interval configuration. By default, this should return True for a valid
+      non-negative interval.
+
+
+

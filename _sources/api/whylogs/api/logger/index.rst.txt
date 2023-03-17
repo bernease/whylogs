@@ -1,0 +1,595 @@
+:py:mod:`whylogs.api.logger`
+============================
+
+.. py:module:: whylogs.api.logger
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   logger/index.rst
+   result_set/index.rst
+   rolling/index.rst
+   segment_cache/index.rst
+   segment_processing/index.rst
+   transient/index.rst
+
+
+Package Contents
+----------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.Logger
+   whylogs.api.logger.ProfileResultSet
+   whylogs.api.logger.ResultSet
+   whylogs.api.logger.ResultSetReader
+   whylogs.api.logger.SegmentedResultSet
+   whylogs.api.logger.TimedRollingLogger
+   whylogs.api.logger.TransientLogger
+   whylogs.api.logger.DatasetProfile
+   whylogs.api.logger.DatasetSchema
+   whylogs.api.logger.ModelPerformanceMetrics
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.log
+   whylogs.api.logger.log_classification_metrics
+   whylogs.api.logger.log_regression_metrics
+   whylogs.api.logger.read
+   whylogs.api.logger.reader
+   whylogs.api.logger.write
+   whylogs.api.logger.logger
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   whylogs.api.logger.diagnostic_logger
+
+
+.. py:class:: Logger(schema: Optional[whylogs.core.DatasetSchema] = None)
+
+   Bases: :py:obj:`abc.ABC`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: check_writer(_: whylogs.api.writer.Writer) -> None
+
+      Checks if a writer is configured correctly for this class
+
+
+   .. py:method:: append_writer(name: Optional[str] = None, *, writer: Optional[whylogs.api.writer.Writer] = None, **kwargs: Any) -> None
+
+
+   .. py:method:: append_store(store: whylogs.api.store.ProfileStore) -> None
+
+
+   .. py:method:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None, timestamp_ms: Optional[int] = None) -> whylogs.api.logger.result_set.ResultSet
+
+      :param timestamp_ms: The timestamp of the data being logged. This defaults to now if it isn't provided.
+                           This is used to determine what the dataset timestamp should be. For an hourly model, the dataset
+                           timestamp will end up being the start of the hour of the provided timestamp_ms, UTC.
+
+
+   .. py:method:: close() -> None
+
+
+
+.. py:class:: ProfileResultSet(profile: whylogs.core.DatasetProfile)
+
+   Bases: :py:obj:`ResultSet`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: profile() -> Optional[whylogs.core.DatasetProfile]
+
+
+   .. py:method:: view() -> Optional[whylogs.core.DatasetProfileView]
+
+
+   .. py:method:: zero() -> ProfileResultSet
+      :staticmethod:
+
+
+   .. py:method:: merge(other: ResultSet) -> ViewResultSet
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+
+.. py:class:: ResultSet
+
+   Bases: :py:obj:`abc.ABC`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+   .. py:method:: view() -> Optional[whylogs.core.DatasetProfileView]
+      :abstractmethod:
+
+
+   .. py:method:: profile() -> Optional[whylogs.core.DatasetProfile]
+      :abstractmethod:
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+   .. py:method:: merge(other: ResultSet) -> ResultSet
+      :abstractmethod:
+
+
+
+.. py:class:: ResultSetReader(reader: whylogs.api.reader.Reader)
+
+   .. py:method:: option(**kwargs: Any) -> ResultSetReader
+
+
+   .. py:method:: read(**kwargs: Any) -> ResultSet
+
+
+
+.. py:class:: SegmentedResultSet(segments: Dict[str, Dict[whylogs.core.Segment, Union[whylogs.core.DatasetProfile, whylogs.core.DatasetProfileView]]], partitions: Optional[List[whylogs.core.segmentation_partition.SegmentationPartition]] = None, metrics: Optional[Dict[str, Any]] = None, properties: Optional[Dict[str, Any]] = None)
+
+   Bases: :py:obj:`ResultSet`
+
+   A holder object for profiling results.
+
+   A whylogs.log call can result in more than one profile. This wrapper class
+   simplifies the navigation among these profiles.
+
+   Note that currently we only hold one profile but we're planning to add other
+   kinds of profiles such as segmented profiles here.
+
+   .. py:property:: dataset_properties
+      :type: Optional[Dict[str, Any]]
+
+
+   .. py:property:: dataset_metrics
+      :type: Optional[Dict[str, Any]]
+
+
+   .. py:property:: partitions
+      :type: Optional[List[whylogs.core.segmentation_partition.SegmentationPartition]]
+
+
+   .. py:property:: count
+      :type: int
+
+
+   .. py:property:: model_performance_metric
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:property:: performance_metrics
+      :type: Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: profile(segment: Optional[whylogs.core.Segment] = None) -> Optional[Union[whylogs.core.DatasetProfile, whylogs.core.DatasetProfileView]]
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: segments(restrict_to_parition_id: Optional[str] = None) -> Optional[List[whylogs.core.Segment]]
+
+
+   .. py:method:: segments_in_partition(partition: whylogs.core.segmentation_partition.SegmentationPartition) -> Optional[Dict[whylogs.core.Segment, Union[whylogs.core.DatasetProfile, whylogs.core.DatasetProfileView]]]
+
+
+   .. py:method:: view(segment: Optional[whylogs.core.Segment] = None) -> Optional[whylogs.core.DatasetProfileView]
+
+
+   .. py:method:: get_model_performance_metrics_for_segment(segment: whylogs.core.Segment) -> Optional[whylogs.core.model_performance_metrics.ModelPerformanceMetrics]
+
+
+   .. py:method:: get_writables() -> Optional[List[whylogs.api.writer.writer.Writable]]
+
+
+   .. py:method:: add_metrics_for_segment(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics, segment: whylogs.core.Segment) -> None
+
+
+   .. py:method:: zero() -> SegmentedResultSet
+      :staticmethod:
+
+
+   .. py:method:: add_model_performance_metrics(metrics: whylogs.core.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: add_metric(name: str, metric: whylogs.core.metrics.metrics.Metric) -> None
+
+
+   .. py:method:: merge(other: ResultSet) -> SegmentedResultSet
+
+
+   .. py:method:: read(multi_profile_file: str) -> ResultSet
+      :staticmethod:
+
+
+   .. py:method:: reader(name: str = 'local') -> ResultSetReader
+      :staticmethod:
+
+
+   .. py:method:: writer(name: str = 'local') -> ResultSetWriter
+
+
+
+.. py:class:: TimedRollingLogger(schema: Optional[whylogs.core.DatasetSchema] = None, *, base_name: Optional[str] = None, file_extension: Optional[str] = None, interval: int = 1, when: typing_extensions.Literal[S, M, H, D] = 'H', utc: bool = False, aligned: bool = True, fork: bool = False, skip_empty: bool = False, callback: Optional[Callable[[whylogs.api.writer.Writer, whylogs.core.DatasetProfileView, str], None]] = None)
+
+   Bases: :py:obj:`whylogs.api.logger.logger.Logger`
+
+   A rolling logger that continuously rotates files based on time.
+
+   .. py:method:: check_writer(writer: whylogs.api.writer.Writer) -> None
+
+      Checks if a writer is configured correctly for this class
+
+
+   .. py:method:: close() -> None
+
+
+   .. py:method:: append_writer(name: Optional[str] = None, *, writer: Optional[whylogs.api.writer.Writer] = None, **kwargs: Any) -> None
+
+
+   .. py:method:: append_store(store: whylogs.api.store.ProfileStore) -> None
+
+
+   .. py:method:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None, timestamp_ms: Optional[int] = None) -> whylogs.api.logger.result_set.ResultSet
+
+      :param timestamp_ms: The timestamp of the data being logged. This defaults to now if it isn't provided.
+                           This is used to determine what the dataset timestamp should be. For an hourly model, the dataset
+                           timestamp will end up being the start of the hour of the provided timestamp_ms, UTC.
+
+
+
+.. py:class:: TransientLogger(schema: Optional[whylogs.core.DatasetSchema] = None)
+
+   Bases: :py:obj:`whylogs.api.logger.logger.Logger`
+
+   Helper class that provides a standard way to create an ABC using
+   inheritance.
+
+   .. py:method:: check_writer(_: whylogs.api.writer.Writer) -> None
+
+      Checks if a writer is configured correctly for this class
+
+
+   .. py:method:: append_writer(name: Optional[str] = None, *, writer: Optional[whylogs.api.writer.Writer] = None, **kwargs: Any) -> None
+
+
+   .. py:method:: append_store(store: whylogs.api.store.ProfileStore) -> None
+
+
+   .. py:method:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None, timestamp_ms: Optional[int] = None) -> whylogs.api.logger.result_set.ResultSet
+
+      :param timestamp_ms: The timestamp of the data being logged. This defaults to now if it isn't provided.
+                           This is used to determine what the dataset timestamp should be. For an hourly model, the dataset
+                           timestamp will end up being the start of the hour of the provided timestamp_ms, UTC.
+
+
+   .. py:method:: close() -> None
+
+
+
+.. py:class:: DatasetProfile(schema: Optional[whylogs.core.schema.DatasetSchema] = None, dataset_timestamp: Optional[datetime.datetime] = None, creation_timestamp: Optional[datetime.datetime] = None, metrics: Optional[Dict[str, Union[whylogs.core.metrics.Metric, Any]]] = None)
+
+   Bases: :py:obj:`whylogs.api.writer.writer.Writable`
+
+   Dataset profile represents a collection of in-memory profiling stats for a dataset.
+
+   :param schema: :class:`DatasetSchema`, optional
+                  An object that represents the data column names and types
+   :param dataset_timestamp: int, optional
+                             A timestamp integer that best represents the date tied to the dataset generation.
+                             i.e.: A January 1st 2019 Sales Dataset will have 1546300800000 as the timestamp in miliseconds (UTC).
+                             If None is provided, it will take the current timestamp as default
+   :param creation_timestamp: int, optional
+                              The timestamp tied to the exact moment when the :class:`DatasetProfile` is created.
+                              If None is provided, it will take the current timestamp as default
+
+   .. py:property:: creation_timestamp
+      :type: datetime.datetime
+
+
+   .. py:property:: dataset_timestamp
+      :type: datetime.datetime
+
+
+   .. py:property:: is_active
+      :type: bool
+
+      Returns True if the profile tracking code is currently running.
+
+   .. py:property:: is_empty
+      :type: bool
+
+      Returns True if the profile tracking code is currently running.
+
+   .. py:property:: model_performance_metrics
+      :type: whylogs.core.model_performance_metrics.model_performance_metrics.ModelPerformanceMetrics
+
+
+   .. py:method:: set_dataset_timestamp(dataset_timestamp: datetime.datetime) -> None
+
+
+   .. py:method:: add_metric(col_name: str, metric: whylogs.core.metrics.Metric) -> None
+
+
+   .. py:method:: add_dataset_metric(name: str, metric: whylogs.core.metrics.Metric) -> None
+
+
+   .. py:method:: add_model_performance_metrics(metric: whylogs.core.model_performance_metrics.model_performance_metrics.ModelPerformanceMetrics) -> None
+
+
+   .. py:method:: track(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Mapping[str, Any]] = None) -> None
+
+
+   .. py:method:: view() -> whylogs.core.view.DatasetProfileView
+
+
+   .. py:method:: flush() -> None
+
+
+   .. py:method:: get_default_path(path) -> str
+      :staticmethod:
+
+
+   .. py:method:: write(path: Optional[str] = None, **kwargs: Any) -> Tuple[bool, str]
+
+
+   .. py:method:: read(input_path: str) -> whylogs.core.view.DatasetProfileView
+      :classmethod:
+
+
+
+.. py:class:: DatasetSchema(types: Optional[Dict[str, Any]] = None, default_configs: Optional[whylogs.core.metrics.metrics.MetricConfig] = None, type_mapper: Optional[whylogs.core.datatypes.TypeMapper] = None, resolvers: Optional[whylogs.core.resolvers.Resolver] = None, cache_size: int = 1024, schema_based_automerge: bool = False, segments: Optional[Dict[str, whylogs.core.segmentation_partition.SegmentationPartition]] = None, validators: Optional[Dict[str, List[whylogs.core.validators.validator.Validator]]] = None)
+
+   Defines the schema for tracking metrics in whylogs.
+
+   In order to customize your tracking, you can extend this class to specify your own column schema
+   or your own type resolution. Otherwise, you can just use the default DatasetSchema object.
+
+   Schema objects are also used to group datasets together.
+
+   .. attribute:: types
+
+      required. a dictionay of column name to the Python type.
+
+   .. attribute:: default_configs
+
+      optional. Options to configure various behavior of whylogs.
+
+   .. attribute:: type_mapper
+
+      Optional. a mapper that transates the Python type to standardized whylogs :class:`DataType` object.
+
+   .. attribute:: resolvers
+
+      Optional. an object that defines how to map from a column name, a whylogs :class:`DataType` and a
+      schema to metrics.
+
+   .. rubric:: Examples
+
+   >>> import pandas as pd
+   >>> import numpy as np
+   >>> from whylogs.core import DatasetSchema, DatasetProfile
+   >>> from whylogs.core.resolvers import Resolver, StandardResolver
+   >>>
+   >>> class MyResolver(StandardResolver):
+   ...    pass
+   >>>
+   >>> schema = DatasetSchema(
+   ...    types={
+   ...        "col1": str,
+   ...        "col2": np.int32,
+   ...        "col3": pd.CategoricalDtype(categories=('foo', 'bar'), ordered=True)
+   ...    },
+   ...    resolvers=MyResolver()
+   ... )
+   >>> prof = DatasetProfile(schema)
+   >>> df = pd.DataFrame({"col1": ['foo'], "col2": np.array([1], dtype=np.int32), "col3": ['bar']})
+   >>> prof.track(pandas=df)
+
+   .. py:method:: copy() -> DatasetSchema
+
+      Returns a new instance of the same underlying schema
+
+
+   .. py:method:: resolve(*, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Mapping[str, Any]] = None) -> bool
+
+
+   .. py:method:: get_col_names() -> tuple
+
+
+   .. py:method:: get(name: str) -> Optional[ColumnSchema]
+
+
+
+.. py:class:: ModelPerformanceMetrics(confusion_matrix: Optional[whylogs.core.model_performance_metrics.confusion_matrix.ConfusionMatrix] = None, regression_metrics: Optional[whylogs.core.model_performance_metrics.regression_metrics.RegressionMetrics] = None, metrics: Optional[Dict[str, whylogs.core.metrics.metrics.Metric]] = None, field_metadata: Optional[Dict[str, Set[str]]] = None)
+
+   Container class for various model-related performance metrics
+
+   .. attribute:: confusion_matrix
+
+      ConfusionMatrix which keeps it track of counts with NumberTracker
+
+      :type: ConfusionMatrix
+
+   .. attribute:: regression_metrics
+
+      Regression Metrics keeps track of a common regression metrics in case the targets are continous.
+
+      :type: RegressionMetrics
+
+   .. py:property:: output_fields
+      :type: Optional[List[str]]
+
+
+   .. py:method:: to_protobuf() -> whylogs.core.proto.v0.ModelProfileMessage
+
+
+   .. py:method:: from_protobuf(message: whylogs.core.proto.v0.ModelProfileMessage) -> ModelPerformanceMetrics
+      :classmethod:
+
+
+   .. py:method:: compute_confusion_matrix(predictions: List[Union[str, int, bool, float]], targets: List[Union[str, int, bool, float]], scores: Optional[List[float]] = None)
+
+      computes the confusion_matrix, if one is already present merges to old one.
+
+      :param predictions:
+      :type predictions: List[Union[str, int, bool]]
+      :param targets:
+      :type targets: List[Union[str, int, bool]]
+      :param scores:
+      :type scores: List[float], optional
+
+
+   .. py:method:: compute_regression_metrics(predictions: List[Union[float, int]], targets: List[Union[float, int]])
+
+
+   .. py:method:: add_metadata_to_field(column_name: str, categories: Set[str]) -> None
+
+
+   .. py:method:: specify_output_fields(column_names: Union[str, Set[str]]) -> None
+
+
+   .. py:method:: merge(other) -> ModelPerformanceMetrics
+
+      :type other: ModelMetrics
+
+
+
+.. py:data:: diagnostic_logger
+
+   
+
+.. py:function:: log(obj: Any = None, *, pandas: Optional[whylogs.core.stubs.pd.DataFrame] = None, row: Optional[Dict[str, Any]] = None, schema: Optional[whylogs.core.DatasetSchema] = None) -> result_set.ResultSet
+
+
+.. py:function:: log_classification_metrics(data: whylogs.core.stubs.pd.DataFrame, target_column: str, prediction_column: str, score_column: Optional[str] = None, schema: Optional[whylogs.core.DatasetSchema] = None, log_full_data: bool = False) -> result_set.ProfileResultSet
+
+   Function to track metrics based on validation data.
+   user may also pass the associated attribute names associated with
+   target, prediction, and/or score.
+   :param targets: actual validated values
+   :type targets: List[Union[str, bool, float, int]]
+   :param predictions: inferred/predicted values
+   :type predictions: List[Union[str, bool, float, int]]
+   :param scores: assocaited scores for each inferred, all values set to 1 if not
+                  passed
+   :type scores: List[float], optional
+
+
+.. py:function:: log_regression_metrics(data: whylogs.core.stubs.pd.DataFrame, target_column: str, prediction_column: str, schema: Optional[whylogs.core.DatasetSchema] = None, log_full_data: bool = False) -> result_set.ProfileResultSet
+
+   Function to track regression metrics based on validation data.
+   user may also pass the associated attribute names associated with
+   target, prediction, and/or score.
+   :param targets: actual validated values
+   :type targets: List[Union[str, bool, float, int]]
+   :param predictions: inferred/predicted values
+   :type predictions: List[Union[str, bool, float, int]]
+   :param scores: assocaited scores for each inferred, all values set to 1 if not
+                  passed
+   :type scores: List[float], optional
+
+
+.. py:function:: read(path: str) -> result_set.ResultSet
+
+
+.. py:function:: reader(name: str) -> result_set.ResultSetReader
+
+
+.. py:function:: write(profile: whylogs.core.DatasetProfile, base_dir: str) -> None
+
+
+.. py:function:: logger(schema: Optional[whylogs.core.DatasetSchema] = None, *, mode: typing_extensions.Literal[transient, rolling] = 'transient', **kwargs: Any) -> logger.Logger
+
+   :returns: a logger object
+   :rtype: Logger
+
+
